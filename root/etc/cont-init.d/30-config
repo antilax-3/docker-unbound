@@ -1,0 +1,11 @@
+#!/usr/bin/with-contenv bash
+
+# copy config and root anchor key
+[[ ! -e /config/unbound.conf ]] && \
+	cp /defaults/unbound.conf /config/unbound.conf
+[[ ! -e /config/trusted-key.key ]] && \
+	cp /defaults/trusted-key.key /config/trusted-key.key
+
+# permissions
+chown -R abc:abc \
+	/config

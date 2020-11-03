@@ -1,4 +1,5 @@
 #!/usr/bin/with-contenv bash
 
+chmod o+w /dev/stdout && \
 exec \
-	s6-setuidgid abc /usr/sbin/unbound -c /config/unbound.conf
+	/usr/sbin/unbound -c /config/unbound.conf

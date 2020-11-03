@@ -16,10 +16,8 @@ echo "**** install runtime packages ****" && \
 echo "@edge http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories && \
 apk add --no-cache \
     bind-tools@edge \
-    libcap \
     unbound@edge && \
 echo "**** setup unbound ****" && \
-setcap cap_net_bind_service=+ep /usr/sbin/unbound && \
 /usr/sbin/unbound-anchor -a /defaults/trusted-key.key | true
 
 # ports, volumes and healthcheck

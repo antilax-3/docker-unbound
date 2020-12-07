@@ -16,6 +16,7 @@ echo "**** install runtime packages ****" && \
 echo "@edge http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories && \
 apk add --no-cache \
     bind-tools@edge \
+    musl@edge \
     unbound@edge && \
 echo "**** setup unbound ****" && \
 /usr/sbin/unbound-anchor -a /defaults/trusted-key.key | true

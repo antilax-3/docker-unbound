@@ -46,5 +46,6 @@ The unbound.conf is copied to the /config volume when first run.
 [Unbound documentation](https://nlnetlabs.nl/documentation/unbound/unbound.conf/) details each option and its expected value(s).
 
 ## Version
+- **07/12/20:** Install edge version of musl
 - **03/11/20:** Drop permissions through Unbound, fix logging and remove libcap requirement
 - **03/11/20:** Initial Release

@@ -12,13 +12,22 @@ COPY root/ /
 
 # install packages
 RUN \
+echo "**** install build packages ****" && \
+apk add --no-cache --virtual=build-dependencies \
+    curl && \
 echo "**** install runtime packages ****" && \
 apk add --no-cache \
     bind-tools \
     musl \
     unbound && \
 echo "**** setup unbound ****" && \
-/usr/sbin/unbound-anchor -a /defaults/trusted-key.key | true
+    curl -fs --retry 3 -o /etc/unbound/root.hints https://www.internic.net/domain/named.cache && \
+    /usr/sbin/unbound-anchor -a /usr/share/dnssec-root/trusted-key.key | true && \
+echo "**** cleanup ****" && \
+apk del --purge \
+    build-dependencies && \
+rm -rf \
+    /tmp/*
 
 # ports, volumes and healthcheck
 EXPOSE 53 53/udp

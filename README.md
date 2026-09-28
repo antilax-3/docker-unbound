@@ -45,6 +45,20 @@ The unbound.conf is copied to the /config volume when first run.
 
 [Unbound documentation](https://nlnetlabs.nl/documentation/unbound/unbound.conf/) details each option and its expected value(s).
 
+## Development
+
+Linting runs locally through [lefthook](https://github.com/evilmartians/lefthook). Install the hooks once per clone:
+
+```bash
+lefthook install
+```
+
+`pre-commit` runs [editorconfig-checker](https://github.com/editorconfig-checker/editorconfig-checker), [hadolint](https://github.com/hadolint/hadolint), `jq`, [shellcheck](https://github.com/koalaman/shellcheck), [typos](https://github.com/crate-ci/typos) and [yamllint](https://github.com/adrienverge/yamllint) over the staged files, and `commit-msg` enforces [Conventional Commits](https://www.conventionalcommits.org). Run everything on demand with:
+
+```bash
+lefthook run pre-commit --all-files
+```
+
 ## Version
 - **29/09/26:** Keep the DNSSEC trust anchor in /config, where unbound can update it
 - **04/07/25:** Updated to use alpine 3.22 image and s6 v3 service structure

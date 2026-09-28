@@ -1,1 +1,5 @@
+# Local lefthook overrides
+.lefthook-local.yml
+
+# IDE files
 .idea/

@@ -2,6 +2,7 @@
 ARG BASE_IMAGE="antilax3/alpine:latest"
 
 # set unbound version
+# renovate: datasource=github-releases depName=unbound packageName=NLnetLabs/unbound
 ARG UNBOUND_VERSION="1.26.1"
 
 FROM --platform=${BUILDPLATFORM} ${BASE_IMAGE} AS build

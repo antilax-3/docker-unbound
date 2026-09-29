@@ -1,0 +1,36 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":semanticCommits",
+    ":semanticCommitTypeAll(build)",
+    ":separatePatchReleases"
+  ],
+  "ignorePresets": [
+    ":semanticPrefixFixDepsChoreOthers"
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Update Dockerfile ARG versions annotated with a preceding '# renovate: datasource=<datasource> depName=<depName>' comment, e.g. unbound. A packageName after the depName keeps a long lookup path out of the commit subject.",
+      "managerFilePatterns": [
+        "/(^|/)Dockerfile$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)( packageName=(?<packageName>\\S+))?\\s+ARG [A-Z_]+=\"(?<currentValue>[^\"]+)\""
+      ]
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Unbound tags releases as release-<major>.<minor>.<patch>. Release candidates are tagged but never published as GitHub releases, so only final releases are proposed.",
+      "matchDatasources": [
+        "github-releases"
+      ],
+      "matchPackageNames": [
+        "NLnetLabs/unbound"
+      ],
+      "extractVersion": "^release-(?<version>\\d+\\.\\d+\\.\\d+)$"
+    }
+  ]
+}

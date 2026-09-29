@@ -79,6 +79,8 @@ check "abc passwd entry" "abc:911:911:/config:/bin/false" \
   "$(run "" "grep '^abc:' /etc/passwd | cut -d: -f1,3,4,6,7")"
 check "abc is in the users group" "yes" "$(run "" "id -nG abc | tr ' ' '\\n' | grep -qx users && echo yes")"
 check "container keeps s6 supervision" "0" "$(docker run --rm --platform "${DOCKER_PLATFORM}" "${PLATFORM_IMAGE}" true > /dev/null 2>&1; echo $?)"
+check "s6-overlay starts without deprecation warnings" "" \
+  "$(docker run --rm --platform "${DOCKER_PLATFORM}" "${PLATFORM_IMAGE}" true 2>&1 | grep -i 'deprecated')"
 
 echo "--- :globe_with_meridians: Unbound ${UNBOUND_RELEASE}"
 check "unbound version is ${UNBOUND_RELEASE}" "Version ${UNBOUND_RELEASE}" "$(run "" "unbound -V | head -n1")"

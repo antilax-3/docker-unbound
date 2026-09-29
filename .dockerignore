@@ -1,6 +1,13 @@
+.buildkite
+.dockerignore
+.editorconfig
 .git
-.gitignore
-.github
 .gitattributes
-READMETEMPLATE.md
+.gitignore
+.hadolint.yaml
+.idea
+.lefthook.yml
+.shellcheckrc
+.yamllint.yml
 README.md
+renovate.json

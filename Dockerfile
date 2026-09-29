@@ -1,4 +1,4 @@
-FROM antilax3/alpine
+FROM antilax3/alpine:latest
 
 # set version label
 ARG build_date
@@ -22,7 +22,7 @@ RUN \
       unbound && \
   echo "**** setup unbound ****" && \
     curl -fs --retry 3 -o /etc/unbound/root.hints https://www.internic.net/domain/named.cache && \
-    /usr/sbin/unbound-anchor -a /usr/share/dnssec-root/trusted-key.key | true && \
+    { /usr/sbin/unbound-anchor -a /usr/share/dnssec-root/trusted-key.key || true; } && \
   echo "**** cleanup ****" && \
     apk del --purge \
       build-dependencies && \

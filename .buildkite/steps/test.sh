@@ -13,8 +13,16 @@ case "${PLATFORM}" in
   armv7) APK_ARCH="armv7"; ELF_MACHINE="40" ;;
 esac
 
-# The user database is read out of /etc/passwd rather than through getent, which not every base ships.
+# The variants differ in libc, in the interpreter every binary is linked against, and in which packages the build
+# needs. Wolfi also ships no getent, so the user database is read out of /etc/passwd, which both bases have.
 case "${VARIANT}" in
+  wolfi)
+    OS_ID="wolfi"; LIBC="glibc"; INTERPRETER="/lib/ld-linux-*"
+    RUNTIME_PACKAGES="bind-tools dnssec-root"
+    # nghttp2-dev is a build package too, but wolfi's bind-libs, which dig needs, declares it as a runtime dependency.
+    BUILD_PACKAGES="clang curl expat-dev gcc glibc-dev gnupg-dirmngr gpg hiredis-dev libevent-dev lld llvm make"
+    BUILD_PACKAGES+=" openssl-dev pkgconf protobuf-c-compiler protobuf-c-dev protoc"
+    ;;
   alpine)
     OS_ID="alpine"; LIBC="musl"; INTERPRETER="/lib/ld-musl-*"
     RUNTIME_PACKAGES="bind-tools dnssec-root"
@@ -87,8 +95,9 @@ check "unbound version is ${UNBOUND_RELEASE}" "Version ${UNBOUND_RELEASE}" "$(ru
 check "unbound is built for ${APK_ARCH}" "${ELF_MACHINE}" "$(run "" "od -An -tu2 -j18 -N2 /usr/sbin/unbound" | xargs)"
 check "every unbound binary runs" "${UNBOUND_BINARIES}" \
   "$(run "" "for b in ${UNBOUND_BINARIES}; do \${b} -h > /dev/null 2>&1; [ \$? -le 1 ] && echo \${b}; done" | xargs)"
+# Wolfi ships no ldd, so each binary's libraries are listed through the dynamic loader itself, which both libcs support.
 check "every shared library unbound links resolves" "" \
-  "$(run "" "for b in ${UNBOUND_BINARIES}; do ldd /usr/sbin/\${b} 2>&1 | grep -i 'not found'; done")"
+  "$(run "" "for b in ${UNBOUND_BINARIES}; do ${INTERPRETER} --list /usr/sbin/\${b} 2>&1 | grep -iE 'not found|error'; done")"
 check "unbound links the dns64, cachedb, subnet and respip modules" "dns64 cachedb subnetcache respip validator iterator" \
   "$(run "" "unbound -V | sed -n 's/^Linked modules: //p'")"
 check "unbound is built with dnstap" "yes" \

@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-ARG BASE_IMAGE="antilax3/alpine:latest"
+ARG BASE_IMAGE="antilax3/wolfi:latest"
 
 # set unbound version
 # renovate: datasource=github-releases depName=unbound packageName=NLnetLabs/unbound
@@ -41,9 +41,25 @@ esac
 UNBOUND_RELEASE="https://nlnetlabs.nl/downloads/unbound"
 UNBOUND_TARBALL="unbound-${UNBOUND_VERSION}.tar.gz"
 
-TARGET_TRIPLE="${TARGET_APK_ARCH}-alpine-linux-musl"
-BUILD_PACKAGES="clang curl gnupg lld llvm make pkgconf protobuf-c-compiler"
-SYSROOT_PACKAGES="expat-dev gcc hiredis-dev libevent-dev linux-headers musl-dev nghttp2-dev openssl-dev protobuf-c-dev"
+COMMON_SYSROOT_PACKAGES="expat-dev gcc hiredis-dev libevent-dev linux-headers nghttp2-dev openssl-dev protobuf-c-dev"
+if ls /lib/ld-musl-* > /dev/null 2>&1; then
+  TARGET_TRIPLE="${TARGET_APK_ARCH}-alpine-linux-musl"
+  BUILD_PACKAGES="clang curl gnupg lld llvm make pkgconf protobuf-c-compiler"
+  SYSROOT_PACKAGES="${COMMON_SYSROOT_PACKAGES} musl-dev"
+else
+  case "${TARGET_APK_ARCH}" in
+    x86_64) TARGET_TRIPLE="x86_64-pc-linux-gnu" ;;
+    aarch64) TARGET_TRIPLE="aarch64-unknown-linux-gnu" ;;
+  esac
+  BUILD_PACKAGES="clang curl gnupg-dirmngr gpg lld llvm make pkgconf protobuf-c-compiler protoc"
+  SYSROOT_PACKAGES="${COMMON_SYSROOT_PACKAGES} glibc-dev"
+fi
+
+# wolfi merges /usr/sbin into /usr/bin, and a linked copy into /usr/sbin would shadow that symlink
+SBINDIR="/usr/sbin"
+if [ -L /usr/sbin ]; then
+  SBINDIR="/usr/bin"
+fi
 
 echo "**** install build packages ****"
 # shellcheck disable=SC2086 # the package lists are deliberately word split.
@@ -84,6 +100,7 @@ export PKG_CONFIG_LIBDIR="/sysroot/usr/lib/pkgconfig:/sysroot/usr/share/pkgconfi
   --build="$(clang -dumpmachine)" \
   --host="${TARGET_TRIPLE}" \
   --prefix=/usr \
+  --sbindir="${SBINDIR}" \
   --sysconfdir=/etc \
   --localstatedir=/var \
   --with-username=abc \
@@ -120,7 +137,7 @@ rm -rf /out/usr/include /out/usr/lib/pkgconfig /out/usr/lib/*.la /out/usr/share
 
 # unbound-control-setup is a shell script; everything else installed is elf
 ELF_FILES=""
-for file in /out/usr/sbin/* /out/usr/lib/libunbound.so.*; do
+for file in "/out${SBINDIR}"/* /out/usr/lib/libunbound.so.*; do
   if [ ! -L "${file}" ] && llvm-readelf -h "${file}" > /dev/null 2>&1; then
     ELF_FILES="${ELF_FILES} ${file}"
   fi

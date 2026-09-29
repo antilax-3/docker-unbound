@@ -13,6 +13,17 @@ docker create --name=unbound \
 -p 53:53/udp \
 antilax3/unbound
 ```
+## Tags
+
+Two variants are built from the one Dockerfile, for `linux/amd64` and `linux/arm64`.
+
+| Variant | Base | Tags |
+| --- | --- | --- |
+| wolfi | [antilax3/wolfi](https://hub.docker.com/r/antilax3/wolfi) | `latest`, `1`, `1.26`, `1.26.1` |
+| alpine | [antilax3/alpine](https://hub.docker.com/r/antilax3/alpine) | `alpine`, `1-alpine`, `1.26-alpine`, `1.26.1-alpine` |
+
+Wolfi is the default. Both variants compile the same unbound release from the signed NLnet Labs tarball, with the same features, so the choice between them is only the base and its libc.
+
 ## Parameters
 The parameters are split into two halves, separated by a colon, the left hand side representing the host and the right the container side. For example with a volume -v external:internal - what this shows is the volume mapping from internal to external of the container. So -v /mnt/app/config:/config would map /config from inside the container to be accessible from /mnt/app/config on the host's filesystem.
 
@@ -23,7 +34,7 @@ The parameters are split into two halves, separated by a colon, the left hand si
 - `-e PGID` - for GroupID, see below for explanation
 - `-e TZ` - for setting timezone information, eg Australia/Melbourne
 
-It is based on alpine linux with s6 overlay, for shell access whilst the container is running do `docker exec -it unbound /bin/bash`.
+It is based on wolfi, or alpine linux for the `alpine` tags, with s6 overlay, for shell access whilst the container is running do `docker exec -it unbound /bin/bash`.
 
 ## User / Group Identifiers
 Sometimes when using data volumes (-v flags) permissions issues can arise between the host OS and the container. We avoid this issue by allowing you to specify the user `PUID` and group `PGID`. Ensure the data volume directory on the host is owned by the same user you specify and it will "just work".
@@ -64,6 +75,7 @@ lefthook run pre-commit --all-files
 `UNBOUND_VERSION` is managed by renovate, which resolves it through the [NLnet Labs GitHub releases](https://github.com/NLnetLabs/unbound/releases). Release candidates are only tagged there, never released, so renovate proposes final releases alone. The Dockerfile downloads the matching tarball from [nlnetlabs.nl](https://nlnetlabs.nl/downloads/unbound/) and verifies its signature, and the image tags follow the unbound release.
 
 ## Version
+- **29/09/26:** Build on wolfi by default and publish alpine under its own tags, for amd64 and arm64
 - **29/09/26:** Build unbound 1.26.1 from the signed NLnet Labs release rather than the alpine package
 - **29/09/26:** Keep the DNSSEC trust anchor in /config, where unbound can update it
 - **04/07/25:** Updated to use alpine 3.22 image and s6 v3 service structure

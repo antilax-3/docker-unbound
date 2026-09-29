@@ -25,9 +25,9 @@ resolve_image "${VARIANT}"
 for TAG in ${TAGS}; do BUILDTAGS+="-t ${REGISTRY}/${DOCKER_REPOSITORY}:${TAG} "; done
 
 cat << EOF
-  - group: ":globe_with_meridians: Unbound [${VARIANT}]"
+  - group: ":globe_with_meridians: Unbound ${UNBOUND_RELEASE} [${VARIANT}]"
     steps:
-      - label: ":docker: Build and Deploy [${VARIANT}]"
+      - label: ":docker: Build and Deploy [${UNBOUND_RELEASE}] [${VARIANT}]"
         command: "docker build ${BUILDTAGS::-1} --build-arg BASE_IMAGE=\"$(variant_base "${VARIANT}")\" --build-arg build_date=\"${BUILD_DATE}\" --build-arg version=\"${BUILD_TAG}\" --label org.opencontainers.image.created=\"${CREATED}\" --label org.opencontainers.image.revision=\"${BUILDKITE_COMMIT}\" --label org.opencontainers.image.source=\"https://github.com/${GITHUB_REPOSITORY}\" --label org.opencontainers.image.version=\"${BUILD_TAG}\" --platform ${BUILDPLATFORMS::-1} --provenance mode=max,reproducible=true --sbom true --builder buildx --progress plain --pull --no-cache --push ."
 EOF
 if master; then
@@ -45,7 +45,7 @@ EOF
 for PLATFORM in ${PLATFORMS}; do
 cat << EOF
 
-      - label: ":test_tube: Test Image [${VARIANT}] [${PLATFORM}]"
+      - label: ":test_tube: Test Image [${UNBOUND_RELEASE}] [${VARIANT}] [${PLATFORM}]"
         command: ".buildkite/steps/test.sh"
         depends_on:
           - "build-${VARIANT}"

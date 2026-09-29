@@ -7,4 +7,7 @@ ignored:
   # The base image is deliberately followed at latest and not pinned, so every build picks up its changes without
   # a bump in this repository.
   - DL3007
+  # The build step configures unbound from inside its unpacked source, and a WORKDIR would carry that build directory
+  # into the image's config.
+  - DL3003
 ...

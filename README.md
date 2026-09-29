@@ -60,6 +60,7 @@ lefthook run pre-commit --all-files
 ```
 
 ## Version
+- **29/09/26:** Build unbound 1.26.1 from the signed NLnet Labs release rather than the alpine package
 - **29/09/26:** Keep the DNSSEC trust anchor in /config, where unbound can update it
 - **04/07/25:** Updated to use alpine 3.22 image and s6 v3 service structure
 - **12/08/21:** Fix root.hints and trusted-key.key

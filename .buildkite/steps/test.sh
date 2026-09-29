@@ -8,20 +8,24 @@ resolve_image "${VARIANT}"
 resolve_platform_image "${PLATFORM}" || exit 1
 
 case "${PLATFORM}" in
-  amd64) APK_ARCH="x86_64" ;;
-  arm64) APK_ARCH="aarch64" ;;
-  armv7) APK_ARCH="armv7" ;;
+  amd64) APK_ARCH="x86_64"; ELF_MACHINE="62" ;;
+  arm64) APK_ARCH="aarch64"; ELF_MACHINE="183" ;;
+  armv7) APK_ARCH="armv7"; ELF_MACHINE="40" ;;
 esac
 
 # The user database is read out of /etc/passwd rather than through getent, which not every base ships.
 case "${VARIANT}" in
   alpine)
     OS_ID="alpine"; LIBC="musl"; INTERPRETER="/lib/ld-musl-*"
-    RUNTIME_PACKAGES="bind-tools dnssec-root unbound"; BUILD_PACKAGES="curl"
+    RUNTIME_PACKAGES="bind-tools dnssec-root"
+    BUILD_PACKAGES="clang curl expat-dev gcc gnupg hiredis-dev libevent-dev lld llvm make musl-dev nghttp2-dev openssl-dev"
+    BUILD_PACKAGES+=" pkgconf protobuf-c-compiler protobuf-c-dev"
     ;;
 esac
 
 REVISION="${BUILDKITE_COMMIT}"
+# The binaries unbound installs, all built from source rather than taken from the base's unbound package.
+UNBOUND_BINARIES="unbound unbound-anchor unbound-checkconf unbound-control unbound-host"
 VOLUME="unbound-test-${BUILDKITE_BUILD_NUMBER}-${VARIANT}-${PLATFORM}"
 MARKER="__TEST_OUTPUT__"
 FAILURES=0
@@ -76,8 +80,17 @@ check "abc passwd entry" "abc:911:911:/config:/bin/false" \
 check "abc is in the users group" "yes" "$(run "" "id -nG abc | tr ' ' '\\n' | grep -qx users && echo yes")"
 check "container keeps s6 supervision" "0" "$(docker run --rm --platform "${DOCKER_PLATFORM}" "${PLATFORM_IMAGE}" true > /dev/null 2>&1; echo $?)"
 
-echo "--- :globe_with_meridians: Unbound"
-check "unbound runs" "found" "$(run "" "unbound -V | grep -q '^Version ' && echo found")"
+echo "--- :globe_with_meridians: Unbound ${UNBOUND_RELEASE}"
+check "unbound version is ${UNBOUND_RELEASE}" "Version ${UNBOUND_RELEASE}" "$(run "" "unbound -V | head -n1")"
+check "unbound is built for ${APK_ARCH}" "${ELF_MACHINE}" "$(run "" "od -An -tu2 -j18 -N2 /usr/sbin/unbound" | xargs)"
+check "every unbound binary runs" "${UNBOUND_BINARIES}" \
+  "$(run "" "for b in ${UNBOUND_BINARIES}; do \${b} -h > /dev/null 2>&1; [ \$? -le 1 ] && echo \${b}; done" | xargs)"
+check "every shared library unbound links resolves" "" \
+  "$(run "" "for b in ${UNBOUND_BINARIES}; do ldd /usr/sbin/\${b} 2>&1 | grep -i 'not found'; done")"
+check "unbound links the dns64, cachedb, subnet and respip modules" "dns64 cachedb subnetcache respip validator iterator" \
+  "$(run "" "unbound -V | sed -n 's/^Linked modules: //p'")"
+check "unbound is built with dnstap" "yes" \
+  "$(run "" "printf 'server:\\ndnstap:\\n  dnstap-enable: yes\\n' > /tmp/dnstap.conf; unbound-checkconf -o dnstap-enable /tmp/dnstap.conf")"
 check "ports 53/tcp and 53/udp are exposed" '{"53/tcp":{},"53/udp":{}}' \
   "$(docker image inspect -f '{{json .Config.ExposedPorts}}' "${PLATFORM_IMAGE}")"
 check "/config is a volume" '{"/config":{}}' "$(docker image inspect -f '{{json .Config.Volumes}}' "${PLATFORM_IMAGE}")"
@@ -108,6 +121,7 @@ check "an existing config is not overwritten" "  # kept" "$(run "-v ${VOLUME}:/c
 docker volume rm "${VOLUME}" > /dev/null
 
 echo "--- :package: Packages"
+check "unbound is not installed from the base's packages" "" "$(run "" "apk info -e unbound unbound-libs" | xargs)"
 check "runtime packages are installed" "${RUNTIME_PACKAGES}" \
   "$(run "" "for p in ${RUNTIME_PACKAGES}; do apk info -e \${p}; done" | xargs)"
 check "build dependencies are removed" "" \

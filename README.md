@@ -59,6 +59,10 @@ lefthook install
 lefthook run pre-commit --all-files
 ```
 
+### Bumping unbound
+
+`UNBOUND_VERSION` is managed by renovate, which resolves it through the [NLnet Labs GitHub releases](https://github.com/NLnetLabs/unbound/releases). Release candidates are only tagged there, never released, so renovate proposes final releases alone. The Dockerfile downloads the matching tarball from [nlnetlabs.nl](https://nlnetlabs.nl/downloads/unbound/) and verifies its signature, and the image tags follow the unbound release.
+
 ## Version
 - **29/09/26:** Build unbound 1.26.1 from the signed NLnet Labs release rather than the alpine package
 - **29/09/26:** Keep the DNSSEC trust anchor in /config, where unbound can update it

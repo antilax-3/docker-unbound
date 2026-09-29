@@ -23,6 +23,13 @@ PLATFORMS="amd64"
 VARIANTS="alpine"
 DEFAULT_VARIANT="alpine"
 
+DOCKERFILE="${REPOSITORY_ROOT}/Dockerfile"
+# The unbound release, e.g. 1.26.1, from the Dockerfile's UNBOUND_VERSION build arg, and its series (1.26) and major
+# version (1).
+UNBOUND_RELEASE=$(sed -nE 's/^ARG UNBOUND_VERSION="([0-9]+\.[0-9]+\.[0-9]+)"$/\1/p' "${DOCKERFILE}")
+UNBOUND_SERIES="${UNBOUND_RELEASE%.*}"
+UNBOUND_MAJOR="${UNBOUND_RELEASE%%.*}"
+
 # Test jobs keyed "test-<variant>-<platform>" get both from the step key, so steps don't each need them in env.
 # Neither a variant nor a platform name contains a dash, so the split is unambiguous.
 if [[ "${BUILDKITE_STEP_KEY:-}" == test-* ]]; then
@@ -56,7 +63,7 @@ docker_platform() {
   esac
 }
 
-# Returns success for pushes to master, the only builds that publish the latest tag.
+# Returns success for pushes to master, the only builds that publish the latest and version tags.
 master() {
   [[ "${BUILDKITE_BRANCH}" == "master" ]] && [[ "${BUILDKITE_PULL_REQUEST}" == "false" ]]
 }
@@ -70,13 +77,13 @@ sanitize_tag() {
 #   BUILD_TAG - the build-scoped tag, e.g. BK12, also used as the version label/build arg
 #   IMAGE     - the fully qualified build-scoped image the test step pulls
 #   TAGS      - the tags pushed for the build context, following antilax-3/docker-baseimage-alpine:
-#                 local branch -> <branch> with unsafe characters replaced, e.g. renovate/alpine-3.x -> renovate-alpine-3.x
+#                 local branch -> <branch> with unsafe characters replaced, e.g. renovate/unbound-1.x -> renovate-unbound-1.x
 #                 fork PRs     -> PR<number> (Buildkite prefixes fork branch names with owner:)
-#                 master       -> latest, as unbound comes from the base image's packages and has no pinned release
+#                 master       -> latest, <major>, <series> and <release>, e.g. latest 1 1.26 1.26.1
 #               and always BK<build>
 #
 # Every tag of a non-default variant carries that variant's suffix, except the one standing in for latest, which is
-# the bare variant name: a wolfi variant alongside a default alpine would be tagged wolfi.
+# the bare variant name: a wolfi variant alongside a default alpine would be wolfi, 1-wolfi, 1.26-wolfi, 1.26.1-wolfi.
 #
 # $1 - the variant, defaulting to DEFAULT_VARIANT
 resolve_image() {
@@ -92,7 +99,7 @@ resolve_image() {
   elif [[ "${BUILDKITE_BRANCH}" =~ .*:.* ]]; then
     TAGS="PR${BUILDKITE_PULL_REQUEST}${suffix}"
   elif master; then
-    TAGS="${suffix:-latest}"
+    TAGS="${suffix:-latest} ${UNBOUND_MAJOR}${suffix} ${UNBOUND_SERIES}${suffix} ${UNBOUND_RELEASE}${suffix}"
     TAGS="${TAGS#-}"
   fi
 

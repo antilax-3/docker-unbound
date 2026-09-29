@@ -20,8 +20,8 @@ REGISTRY="docker.io"
 PLATFORMS="amd64 arm64"
 # Base images every variant is built on, in tag order. The first is the default variant and takes the unsuffixed
 # tags; the others take a tag suffix of their own name, following the docker-library convention.
-VARIANTS="alpine"
-DEFAULT_VARIANT="alpine"
+VARIANTS="wolfi alpine"
+DEFAULT_VARIANT="wolfi"
 
 DOCKERFILE="${REPOSITORY_ROOT}/Dockerfile"
 # The unbound release, e.g. 1.26.1, from the Dockerfile's UNBOUND_VERSION build arg, and its series (1.26) and major
@@ -41,6 +41,7 @@ fi
 # Prints the base image a variant is built on.
 variant_base() {
   case "${1}" in
+    wolfi) echo "antilax3/wolfi:latest" ;;
     alpine) echo "antilax3/alpine:latest" ;;
   esac
 }
@@ -83,7 +84,7 @@ sanitize_tag() {
 #               and always BK<build>
 #
 # Every tag of a non-default variant carries that variant's suffix, except the one standing in for latest, which is
-# the bare variant name: a wolfi variant alongside a default alpine would be wolfi, 1-wolfi, 1.26-wolfi, 1.26.1-wolfi.
+# the bare variant name: the alpine variant of the above is alpine, 1-alpine, 1.26-alpine, 1.26.1-alpine.
 #
 # $1 - the variant, defaulting to DEFAULT_VARIANT
 resolve_image() {

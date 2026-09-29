@@ -15,9 +15,9 @@ REPOSITORY_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 GITHUB_REPOSITORY="antilax-3/docker-unbound"
 DOCKER_REPOSITORY="antilax3/unbound"
 REGISTRY="docker.io"
-# Platforms every image is built for, by the short name used in test step keys and labels. amd64 is the only platform
-# the Jenkins job published.
-PLATFORMS="amd64"
+# Platforms every image is built for, by the short name used in test step keys and labels. armv7 is absent because
+# antilax3/wolfi, like the wolfi-base image beneath it, publishes amd64 and arm64 only.
+PLATFORMS="amd64 arm64"
 # Base images every variant is built on, in tag order. The first is the default variant and takes the unsuffixed
 # tags; the others take a tag suffix of their own name, following the docker-library convention.
 VARIANTS="alpine"

@@ -4,7 +4,11 @@
 [[ ! -e /config/unbound.conf ]] && \
 	cp /defaults/unbound.conf /config/unbound.conf
 [[ ! -e /config/trusted-key.key ]] && \
-	cp /defaults/trusted-key.key /config/trusted-key.key
+	cp /usr/share/dnssec-root/trusted-key.key /config/trusted-key.key
+
+# unbound rewrites the trust anchor as the root key rolls, which it cannot do in the root owned package directory
+sed -i 's|^\(\s*auto-trust-anchor-file:\s*\)/usr/share/dnssec-root/trusted-key\.key\s*$|\1/config/trusted-key.key|' \
+	/config/unbound.conf
 
 # permissions
 chown -R abc:abc \

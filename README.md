@@ -46,6 +46,7 @@ The unbound.conf is copied to the /config volume when first run.
 [Unbound documentation](https://nlnetlabs.nl/documentation/unbound/unbound.conf/) details each option and its expected value(s).
 
 ## Version
+- **29/09/26:** Keep the DNSSEC trust anchor in /config, where unbound can update it
 - **04/07/25:** Updated to use alpine 3.22 image and s6 v3 service structure
 - **12/08/21:** Fix root.hints and trusted-key.key
 - **12/06/21:** Drop edge version of applications

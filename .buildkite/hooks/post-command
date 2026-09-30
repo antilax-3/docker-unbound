@@ -27,8 +27,11 @@ if [[ "${BUILDKITE_LABEL}" =~ ^:docker:\ Build\ and\ Deploy ]] && master; then
 
   # latest, the bare variant tags, BK and version tags (1, 1.26, 1.26.1 and the old Jenkins build numbers, which
   # share the same shape) are never removed, with or without a variant suffix.
+  # BK and version tags are kept with any suffix, not only this build's variants: a branch adding a variant pushes
+  # BK<n>-<variant> tags that master doesn't know yet, and its test steps pull them while a master build may be cleaning
+  # up.
   variant_pattern=$(tr ' ' '|' <<< "${VARIANTS}")
-  keep="^(latest|${variant_pattern}|(BK[0-9]+|PR[0-9]+|[0-9]+(\.[0-9]+)*)(-(${variant_pattern}))?)$"
+  keep="^(latest|${variant_pattern}|(BK[0-9]+|[0-9]+(\.[0-9]+)*)(-[a-z0-9]+)?|PR[0-9]+(-(${variant_pattern}))?)$"
 
   echo "--- :docker: Removing tags for deleted branches"
   dockerbranchtags=$(grep -vE "${keep}" <<< "${dockertags}")

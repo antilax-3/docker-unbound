@@ -1,8 +1,14 @@
-[logo]: https://ci.nerv.com.au/userContent/antilax-3.png "AntilaX-3"
-[![alt text][logo]](https://github.com/AntilaX-3/)
+<p align="center">
+  <a href="https://github.com/AntilaX-3/"><img src="https://avatars.githubusercontent.com/u/35715409" width="150" title="AntilaX-3"></a>
+</p>
+
+<p align="center">
+  <a href="https://buildkite.com/antilax-3/unbound"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/dynamic/json.svg?url=https%3A%2F%2Fimg.shields.io%2Fbuildkite%2F06df4de431ba3e21fa262198711fb5800dfd0d9c5a3e9b55c3%2Fmaster.json&query=%24.message&label=build&logo=buildkite&logoColor=%2314cc80&mode=dark&size=sm&variant=outline"><img alt="Build" src="https://shieldcn.dev/badge/dynamic/json.svg?url=https%3A%2F%2Fimg.shields.io%2Fbuildkite%2F06df4de431ba3e21fa262198711fb5800dfd0d9c5a3e9b55c3%2Fmaster.json&query=%24.message&label=build&logo=buildkite&logoColor=%2314cc80&mode=light&size=sm&variant=outline"></picture></a>
+  <a href="https://hub.docker.com/r/antilax3/unbound/tags"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/dynamic/json.svg?url=https%3A%2F%2Fimg.shields.io%2Fdocker%2Fimage-size%2Fantilax3%2Funbound%2Flatest.json&query=%24.message&label=image%20size&logo=docker&logoColor=%232496ed&mode=dark&size=sm&variant=outline"><img alt="Docker Size" src="https://shieldcn.dev/badge/dynamic/json.svg?url=https%3A%2F%2Fimg.shields.io%2Fdocker%2Fimage-size%2Fantilax3%2Funbound%2Flatest.json&query=%24.message&label=image%20size&logo=docker&logoColor=%232496ed&mode=light&size=sm&variant=outline"></picture></a>
+  <a href="https://hub.docker.com/r/antilax3/unbound"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/dynamic/json.svg?url=https%3A%2F%2Fimg.shields.io%2Fdocker%2Fpulls%2Fantilax3%2Funbound.json&query=%24.message&label=pulls&logo=docker&logoColor=%232496ed&mode=dark&size=sm&variant=outline"><img alt="Docker Pulls" src="https://shieldcn.dev/badge/dynamic/json.svg?url=https%3A%2F%2Fimg.shields.io%2Fdocker%2Fpulls%2Fantilax3%2Funbound.json&query=%24.message&label=pulls&logo=docker&logoColor=%232496ed&mode=light&size=sm&variant=outline"></picture></a>
+</p>
 
 # AntilaX-3/unbound
-[![](https://images.microbadger.com/badges/version/antilax3/unbound.svg)](https://microbadger.com/images/antilax3/unbound "Get your own version badge on microbadger.com") [![](https://images.microbadger.com/badges/image/antilax3/unbound.svg)](https://microbadger.com/images/antilax3/unbound "Get your own image badge on microbadger.com") [![Docker Pulls](https://img.shields.io/docker/pulls/antilax3/unbound.svg)](https://hub.docker.com/r/antilax3/unbound/) [![Docker Stars](https://img.shields.io/docker/stars/antilax3/unbound.svg)](https://hub.docker.com/r/antilax3/unbound/)
 
 [Unbound](https://www.nlnetlabs.nl/projects/unbound/about/) is a validating, recursive, caching DNS resolver. 
 ## Usage

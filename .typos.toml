@@ -1,0 +1,3 @@
+[default.extend-words]
+# the GOST signature algorithms unbound can build with, not a misspelling of ghost
+gost = "gost"

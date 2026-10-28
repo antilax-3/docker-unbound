@@ -122,7 +122,7 @@ export PKG_CONFIG_LIBDIR="/sysroot/usr/lib/pkgconfig:/sysroot/usr/share/pkgconfi
   --disable-static \
   --disable-rpath \
   --disable-dsa \
-  --disable-ghost \
+  --disable-gost \
   --without-pythonmodule \
   --without-pyunbound \
   CC="clang --target=${TARGET_TRIPLE} --sysroot=/sysroot -fuse-ld=lld" \

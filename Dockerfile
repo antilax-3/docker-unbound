@@ -3,7 +3,7 @@ ARG BASE_IMAGE="antilax3/wolfi:latest"
 
 # set unbound version
 # renovate: datasource=github-releases depName=unbound packageName=NLnetLabs/unbound
-ARG UNBOUND_VERSION="1.26.1"
+ARG UNBOUND_VERSION="1.26.2"
 
 FROM --platform=${BUILDPLATFORM} ${BASE_IMAGE} AS build
 
